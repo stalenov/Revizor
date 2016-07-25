@@ -1,36 +1,29 @@
 package com.kotsokrat.revizor;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.loopj.android.http.*;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.URI;
-
-import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpResponse;
 
 public class MainActivity extends AppCompatActivity {
     public String httpAddr = "http://84.204.30.84:56565/restInvent/index.php";
-
+    public SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DBHelper dbHelper = new DBHelper(this);
+        db = dbHelper.getWritableDatabase();
+
+
         final TextView tvStatusCode = (TextView)findViewById(R.id.tvStatusCode);
         final TextView tvHeaderw = (TextView)findViewById(R.id.tvHeaders);
         final TextView tvMsgBody = (TextView)findViewById(R.id.tvMsgBody);
 
-        REST rest = new REST(httpAddr);
-        rest.getItemsByInum(370);
+        new REST(httpAddr).getItemsByInum(db, 370);
 
 
 
