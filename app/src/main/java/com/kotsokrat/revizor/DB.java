@@ -18,6 +18,7 @@ public class DB {
     public static final String LAST_VERIFIED = "last_verified";
 
     public static final String TABLE_NAME = "invent";
+    Context context;
 
     public void loadItemsFromREST(JSONArray jArray, SQLiteDatabase db) {
         try {
@@ -40,10 +41,7 @@ public class DB {
 
     }
 
-
-
-
-
-
-
+    public DB(Context context) {
+        this.context = context;
+    }
 }
