@@ -14,17 +14,17 @@
                 android:layout_width="140sp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:inputType="number" />
+                android:imeOptions="actionSearch"
+                android:inputType="number"/>
             <Button
                 android:id="@+id/btnInum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/btnInumName"/>
-
     </LinearLayout>
-    <TextView
 
+    <TextView
         android:id="@+id/tvInfo"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_marginTop="4dp"
@@ -32,10 +32,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""/>
-
+    <View
+        android:id="@+id/href"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/background_light" />
     <ListView
         android:id="@+id/tvData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
 </LinearLayout>

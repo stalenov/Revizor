@@ -8,11 +8,15 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -60,6 +64,7 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
 
         btn = (Button)findViewById(R.id.btnInum);
         btn.setOnClickListener(new BtnInumListener());
+        etInum.setOnEditorActionListener(new EtInumListener());
 
         String[] scaSource = new String[] {DBA.NUM, DBA.ITEM, DBA.CONF, DBA.LAST_VERIFIED};
         int[] scaDest = new int[]{ R.id.tvListInum, R.id.tvListItem, R.id.tvListConf, R.id.ivListState};
@@ -70,6 +75,20 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
         dba.flushDB();
         getSupportLoaderManager().initLoader(0, null, this);
    }
+
+
+    // listen enter pressed in editText
+    private class EtInumListener implements TextView.OnEditorActionListener{
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+                int inum = Integer.parseInt(etInum.getText().toString());
+                loadALLtoDbByInum(inum);
+                Log.d("myTag", "SEARCH SOFTKEY PRESSED!!!!!!");
+            }
+            return false;
+        }
+    }
 
 
     @Override
@@ -90,8 +109,10 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
         cursor.moveToFirst();
         StringBuilder sb = new StringBuilder();
         sb.append(getString(R.string.aboutOwner))
+                .append(" ")
                 .append(cursor.getString(cursor.getColumnIndex(DBA.OWNER)))
                 .append(getString(R.string.aboutSenior))
+                .append(" ")
                 .append(cursor.getString(cursor.getColumnIndex(DBA.SENIOR)));
         tvInfo.setText(sb.toString());
     }
@@ -130,16 +151,12 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
                 break;
             case R.id.cm_set_as_notok:
                 insertInumStatus(num, STATUS_NOTOK);
-                updateBd();
-                //getSupportLoaderManager().getLoader(0).forceLoad();
-                getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
+                //updateBd();
                 Log.d(t, "selected set_as_notok");
                 break;
             case R.id.cm_mark_as_lost:
                 insertInumStatus(num, STATUS_LOST);
-                updateBd();
-                //getSupportLoaderManager().getLoader(0).forceLoad();
-                getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
+                //updateBd();
                 Log.d(t, "selected mark_as_lost");
                 break;
             default:
@@ -164,11 +181,11 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                updateBd();
-                getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
                 Log.d(t, response.toString());
+                updateBd();
+                //getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
+                getSupportLoaderManager().getLoader(0).forceLoad();
                 Toast.makeText(MainActivity.this, "SAVE OK " + response.toString(), Toast.LENGTH_SHORT).show();
-
             }
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
@@ -231,7 +248,7 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
             String num = dba.getInumByTableId(id);
             insertInumStatus(num, STATUS_OK);
             new BtnInumListener().onClick(btn);
-            getSupportLoaderManager().getLoader(0).forceLoad();
+            //getSupportLoaderManager().getLoader(0).forceLoad();
             //getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
         }
     }
@@ -246,8 +263,7 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
                     Log.d(t, "onClick!");
                     int inum = Integer.parseInt(etInum.getText().toString());
                     loadALLtoDbByInum(inum);
-                    //getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
-                    printMetaData();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(MainActivity.this, getString(R.string.toast_if_input_not_number), Toast.LENGTH_SHORT).show();
@@ -260,7 +276,6 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
     public void updateBd(){
         int inum = Integer.parseInt(etInum.getText().toString());
         loadALLtoDbByInum(inum);
-        //simpleCursorAdapter.notifyDataSetChanged();
     }
 
 
@@ -273,18 +288,16 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
                 if (statusCode == 200 && response.length() > 0){
-                    //clearListView();
                     dba.flushDB();
                     dba.saveItemsToDB(response);
-
-                    getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
+                    printMetaData();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                 }
             }
 
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 if (statusCode == 200 && response.length() > 0){
-                    //new DBA(context).saveItemsToDB(response);
                     clearListView();
                     Log.d(t, response.toString());
                     Toast.makeText(MainActivity.this, "NO DATA IN DB", Toast.LENGTH_SHORT).show();

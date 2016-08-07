@@ -2,6 +2,6 @@
     <string name="app_name">Revizor</string>
     <string name="btnInumName">Искать</string>
     <string name="toast_if_input_not_number">Номер может состоять только из цифр</string>
-    <string name="aboutOwner">Пользователь: </string>
-    <string name="aboutSenior">\nОтветственный: </string>
+    <string name="aboutOwner">USER:</string>
+    <string name="aboutSenior">\nBOSS:</string>
 </resources>
