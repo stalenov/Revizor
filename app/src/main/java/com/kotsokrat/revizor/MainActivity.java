@@ -1,7 +1,11 @@
 package com.kotsokrat.revizor;
 
-import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,19 +20,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.zip.Inflater;
-
 import cz.msebera.android.httpclient.Header;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>{
     public final String t = "myTag";
     public final String STATUS_OK = "OK";
     public final String STATUS_NOTOK = "NOTOK";
@@ -59,6 +60,15 @@ public class MainActivity extends Activity {
 
         btn = (Button)findViewById(R.id.btnInum);
         btn.setOnClickListener(new BtnInumListener());
+
+        String[] scaSource = new String[] {DBA.NUM, DBA.ITEM, DBA.CONF, DBA.LAST_VERIFIED};
+        int[] scaDest = new int[]{ R.id.tvListInum, R.id.tvListItem, R.id.tvListConf, R.id.ivListState};
+        simpleCursorAdapter = new SimpleCursorAdapter(this, R.layout.list_item, null, scaSource, scaDest, 0);
+        lvData.setAdapter(simpleCursorAdapter);
+        lvData.setOnItemClickListener(new ListItemClick());
+        registerForContextMenu(lvData);
+        dba.flushDB();
+        getSupportLoaderManager().initLoader(0, null, this);
    }
 
 
@@ -72,10 +82,10 @@ public class MainActivity extends Activity {
     /**********************************************************************************************
      * GENERATE DISPLAY INFO AND LISTVIEW
      **********************************************************************************************/
-    void printItemsData(){
-        Log.d(t, "create items list");
+    void printMetaData(){
+        //Log.d(t, "create items list");
         Cursor cursor = dba.getAllItemsFromDB();
-        startManagingCursor(cursor);
+        /*startManagingCursor(cursor);*/
 
         cursor.moveToFirst();
         StringBuilder sb = new StringBuilder();
@@ -84,15 +94,6 @@ public class MainActivity extends Activity {
                 .append(getString(R.string.aboutSenior))
                 .append(cursor.getString(cursor.getColumnIndex(DBA.SENIOR)));
         tvInfo.setText(sb.toString());
-
-
-        String[] scaSource = new String[] {DBA.NUM, DBA.ITEM, DBA.CONF, DBA.LAST_VERIFIED};
-        //String[] scaSource = new String[] {DBA.NUM, DBA.LAST_VERIFIED, DBA.CONF};
-        int[] scaDest = new int[]{ R.id.tvListInum, R.id.tvListItem, R.id.tvListConf, R.id.ivListState};
-        simpleCursorAdapter = new SimpleCursorAdapter(this, R.layout.list_item, cursor, scaSource, scaDest, 0);
-        lvData.setAdapter(simpleCursorAdapter);
-        lvData.setOnItemClickListener(new ListItemClick());
-        registerForContextMenu(lvData);
     }
 
     void clearListView(){
@@ -129,14 +130,16 @@ public class MainActivity extends Activity {
                 break;
             case R.id.cm_set_as_notok:
                 insertInumStatus(num, STATUS_NOTOK);
-                updateBdAndAdapter();
-
-
+                updateBd();
+                //getSupportLoaderManager().getLoader(0).forceLoad();
+                getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
                 Log.d(t, "selected set_as_notok");
                 break;
             case R.id.cm_mark_as_lost:
-
                 insertInumStatus(num, STATUS_LOST);
+                updateBd();
+                //getSupportLoaderManager().getLoader(0).forceLoad();
+                getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
                 Log.d(t, "selected mark_as_lost");
                 break;
             default:
@@ -161,6 +164,8 @@ public class MainActivity extends Activity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                updateBd();
+                getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
                 Log.d(t, response.toString());
                 Toast.makeText(MainActivity.this, "SAVE OK " + response.toString(), Toast.LENGTH_SHORT).show();
 
@@ -174,6 +179,42 @@ public class MainActivity extends Activity {
 
     }
 
+    /**********************************************************************************************
+     * LoaderCallbacks methods implementations
+     **********************************************************************************************/
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new RevizorCursorLoader(this, dba);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        simpleCursorAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    /**********************************************************************************************
+     * Cursor adapter
+     ***********************************************************************************************/
+    static class RevizorCursorLoader extends CursorLoader{
+        DBA dba;
+
+        public RevizorCursorLoader(Context context, DBA dba) {
+            super(context);
+            this.dba = dba;
+        }
+
+        @Override
+        public Cursor loadInBackground() {
+            Log.d("myTag", "revizorCursorLoader loadInBackground");
+            return dba.getAllItemsFromDB();
+        }
+    }
 
 
     /**********************************************************************************************
@@ -185,15 +226,15 @@ public class MainActivity extends Activity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            //Toast.makeText(MainActivity.this, "clicked " + Integer.toString(position), Toast.LENGTH_SHORT).show();
 
             Log.d(t, "clicked position: " + position + ", id: " + id);
             String num = dba.getInumByTableId(id);
             insertInumStatus(num, STATUS_OK);
             new BtnInumListener().onClick(btn);
+            getSupportLoaderManager().getLoader(0).forceLoad();
+            //getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
         }
     }
-
 
     // get data list after button pressed
     private class BtnInumListener implements View.OnClickListener {
@@ -201,13 +242,14 @@ public class MainActivity extends Activity {
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.btnInum) {
-                //Toast.makeText(MainActivity.this, "Button clicked", Toast.LENGTH_SHORT).show();
                 try {
                     Log.d(t, "onClick!");
                     int inum = Integer.parseInt(etInum.getText().toString());
-                    loadALLByInum(inum);
-                    printItemsData();
+                    loadALLtoDbByInum(inum);
+                    //getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
+                    printMetaData();
                 } catch (Exception e) {
+                    e.printStackTrace();
                     Toast.makeText(MainActivity.this, getString(R.string.toast_if_input_not_number), Toast.LENGTH_SHORT).show();
                     clearListView();
                 }
@@ -215,14 +257,14 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void updateBdAndAdapter(){
+    public void updateBd(){
         int inum = Integer.parseInt(etInum.getText().toString());
-        loadALLByInum(inum);
-        simpleCursorAdapter.notifyDataSetChanged();
+        loadALLtoDbByInum(inum);
+        //simpleCursorAdapter.notifyDataSetChanged();
     }
 
 
-    public void loadALLByInum(int inum){
+    public void loadALLtoDbByInum(int inum){
 
         String url = httpAddr + "?num=" + inum;
 
@@ -235,9 +277,9 @@ public class MainActivity extends Activity {
                     dba.flushDB();
                     dba.saveItemsToDB(response);
 
+                    getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
                 }
             }
-
 
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -248,7 +290,6 @@ public class MainActivity extends Activity {
                     Toast.makeText(MainActivity.this, "NO DATA IN DB", Toast.LENGTH_SHORT).show();
                 }
             }
-
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
