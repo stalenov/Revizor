@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/cm_about_id"
+        android:orderInCategory="0"
+        android:title="Подробно"/>
+    <item
+        android:id="@+id/cm_change_user"
+        android:orderInCategory="1"
+        android:title="Изменить пользователя"/>
+    <item
+        android:id="@+id/cm_change_senior"
+        android:orderInCategory="2"
+        android:title="Запрос на акт"/>
+    <item
+        android:id="@+id/cm_set_as_notok"
+        android:orderInCategory="3"
+        android:title="Убить последний ОК"/>
+    <item
+        android:id="@+id/cm_mark_as_lost"
+        android:orderInCategory="4"
+        android:title="Пометить потерянным"/>
+</menu>
