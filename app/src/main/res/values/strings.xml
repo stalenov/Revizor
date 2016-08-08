@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Revizor</string>
+    <string name="app_name">Ревизор</string>
     <string name="btnInumName">Искать</string>
     <string name="toast_if_input_not_number">Номер может состоять только из цифр</string>
     <string name="aboutOwner">USER:</string>
@@ -7,9 +7,9 @@
     <string name="show_about_close_btn">Закрыть</string>
     <string name="tv_dialog_item_text">Наименование</string>
     <string name="tv_dialog_conf_text">Конфигурация</string>
-    <string name="tv_dialog_owner_text">Владелец</string>
+    <string name="tv_dialog_owner_text">Пользователь</string>
     <string name="tv_dialog_department_text">Подразделение</string>
-    <string name="tv_dialog_senior_text">Руководитель</string>
+    <string name="tv_dialog_senior_text">Ответственный</string>
     <string name="tv_dialog_barcode_text">Штрих-код</string>
-    <string name="tv_dialog_last_verified_text">Дата проверки</string>
+    <string name="tv_dialog_last_verified_text">Дней с проверки</string>
 </resources>

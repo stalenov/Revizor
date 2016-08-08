@@ -235,25 +235,18 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
     // Отображение подробной информации по выбранной позиции
     private void show_about(long id){
         Bundle bundle = dba.getAllByTableId(id);
-
         View dialogView = getLayoutInflater().inflate(R.layout.about_item_dialog, null);
-
-
-
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView)
                .setPositiveButton(getString(R.string.show_about_close_btn), new DialogInterface.OnClickListener(){
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+               });
         AlertDialog ab = builder.create();
         ab.show();
-
-        ImageView iv = (ImageView)ab.findViewById(R.id.ivDialog);
+        //ImageView iv = (ImageView)ab.findViewById(R.id.ivDialog);
         TextView tvDialogNum = (TextView)ab.findViewById(R.id.tvDialogNum);
         TextView tvDialogItem = (TextView)ab.findViewById(R.id.tvDialogItem);
         TextView tvDialogConf = (TextView)ab.findViewById(R.id.tvDialogConf);
@@ -263,7 +256,7 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
         TextView tvDialogBarcode = (TextView)ab.findViewById(R.id.tvDialogBarcode);
         TextView tvDialogLastVerified = (TextView)ab.findViewById(R.id.tvDialogLastVerified);
 
-        iv.setImageResource(Integer.parseInt(bundle.getString(DBA.LAST_VERIFIED_ICON)));
+        //iv.setImageResource(Integer.parseInt(bundle.getString(DBA.LAST_VERIFIED_ICON)));
         tvDialogNum.setText(bundle.getString(DBA.NUM));
         tvDialogItem.setText(bundle.getString(DBA.ITEM));
         tvDialogConf.setText(bundle.getString(DBA.CONF));
@@ -272,8 +265,6 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
         tvDialogSenior.setText(bundle.getString(DBA.SENIOR));
         tvDialogBarcode.setText(bundle.getString(DBA.BARCODE));
         tvDialogLastVerified.setText(bundle.getString(DBA.LAST_VERIFIED));
-
-
     }
 
 
