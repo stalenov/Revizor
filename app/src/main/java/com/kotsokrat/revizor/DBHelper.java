@@ -18,7 +18,8 @@ public class DBHelper extends SQLiteOpenHelper {
             + DBA.SENIOR + " TEXT, "
             + DBA.QUANTITY + " TEXT, "
             + DBA.BARCODE + " TEXT, "
-            + DBA.LAST_VERIFIED + " TEXT)";
+            + DBA.LAST_VERIFIED + " TEXT, "
+            + DBA.LAST_VERIFIED_ICON + " TEXT)";
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);

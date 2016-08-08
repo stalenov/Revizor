@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -25,6 +26,7 @@ public class DBA {
     public final static String QUANTITY = "quantity";
     public final static String BARCODE = "barcode";
     public final static String LAST_VERIFIED = "last_verified";
+    public final static String LAST_VERIFIED_ICON = "last_verified_icon";
 
     public final static String TABLE_NAME = "invent";
 
@@ -70,14 +72,14 @@ public class DBA {
                 int state = Integer.parseInt(jArray.getJSONObject(i).getString(LAST_VERIFIED));
                 if (state == -1 || state > revizorCheckPeroid ) {
                     // if out of date or never checked
-                    cv.put(LAST_VERIFIED, R.drawable.question);
+                    cv.put(LAST_VERIFIED_ICON, R.drawable.question);
                 } else {
                     // if check ok
-                    cv.put(LAST_VERIFIED, R.drawable.check);
+                    cv.put(LAST_VERIFIED_ICON, R.drawable.check);
                 }
 
 
-                //cv.put(LAST_VERIFIED, jArray.getJSONObject(i).getString(LAST_VERIFIED));
+                cv.put(LAST_VERIFIED, jArray.getJSONObject(i).getString(LAST_VERIFIED));
                 //cv.put(LAST_VERIFIED, "hren tobi");
 
                 db.insert(TABLE_NAME, null, cv);
@@ -95,13 +97,42 @@ public class DBA {
         if (cursor.getCount() != 0) {
             cursor.moveToFirst();
             Log.d("myTag", "inum: " + cursor.getString(cursor.getColumnIndex(NUM)));
-
             return cursor.getString(cursor.getColumnIndex(NUM));
         }else {
             Log.d("myTag", "!!! ZERO CURSOR ROWS !!!");
             return null;
         }
     }
+
+    public Bundle getAllByTableId(long id){
+        Cursor cursor = db.query(TABLE_NAME, null, "_id = ?", new String[] { Long.toString(id) }, null, null, null);
+        if (cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            Log.d("myTag", "getAllByTableId: " + cursor.getString(cursor.getColumnIndex(NUM)));
+
+            Bundle bundle = new Bundle();
+            bundle.putString(NUM, cursor.getString(cursor.getColumnIndex(NUM)));
+            bundle.putString(ITEM, cursor.getString(cursor.getColumnIndex(ITEM)));
+            bundle.putString(CONF, cursor.getString(cursor.getColumnIndex(CONF)));
+            bundle.putString(OWNER, cursor.getString(cursor.getColumnIndex(OWNER)));
+            bundle.putString(DEPARTMENT, cursor.getString(cursor.getColumnIndex(DEPARTMENT)));
+            bundle.putString(SENIOR, cursor.getString(cursor.getColumnIndex(SENIOR)));
+            bundle.putString(BARCODE, cursor.getString(cursor.getColumnIndex(BARCODE)));
+            bundle.putString(LAST_VERIFIED, cursor.getString(cursor.getColumnIndex(LAST_VERIFIED)));
+            bundle.putString(LAST_VERIFIED_ICON, cursor.getString(cursor.getColumnIndex(LAST_VERIFIED_ICON)));
+
+
+
+            return bundle;
+        }else {
+            Log.d("myTag", "!!! ZERO CURSOR ROWS !!!");
+            return null;
+        }
+
+
+
+    }
+
 
     public void flushDB(){
         db.execSQL("DELETE FROM " + TABLE_NAME);
