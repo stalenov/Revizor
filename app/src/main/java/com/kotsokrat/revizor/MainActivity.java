@@ -9,10 +9,13 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +38,7 @@ import org.w3c.dom.Text;
 import cz.msebera.android.httpclient.Header;
 
 
-public class MainActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
     public final String t = "myTag";
     public final String STATUS_OK = "OK";
     public final String STATUS_NOTOK = "NOTOK";
@@ -78,14 +81,32 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
         registerForContextMenu(lvData);
         dba.flushDB();
         getSupportLoaderManager().initLoader(0, null, this);
-   }
 
+        getSupportActionBar();
+   }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         dba.closeDB();
 
+    }
+
+    /**********************************************************************************************
+     * Menu
+     **********************************************************************************************/
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.actionbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        Toast.makeText(this, "Данная функция пока не реализована!!!", Toast.LENGTH_SHORT).show();
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**********************************************************************************************
@@ -131,9 +152,11 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
                 show_about(listPosition);
                 break;
             case R.id.cm_change_user:
+                Toast.makeText(this, "Данная функция пока не реализована!!!", Toast.LENGTH_SHORT).show();
                 Log.d(t, "selected change_user");
                 break;
             case R.id.cm_change_senior:
+                Toast.makeText(this, "Данная функция пока не реализована!!!", Toast.LENGTH_SHORT).show();
                 Log.d(t, "selected change_senior");
                 break;
             case R.id.cm_set_as_notok:
@@ -275,11 +298,11 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
      public void getSaveShowAll(){
         int inum = Integer.parseInt(etInum.getText().toString());
         String url = httpAddr + "?num=" + inum;
-        httpClient.get(url, new JsonHttpResponseHandler(){
+        httpClient.get(url, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
-                if (statusCode == 200 && response.length() > 0){
+                if (statusCode == 200 && response.length() > 0) {
                     dba.flushDB();
                     dba.saveItemsToDB(response);
                     printMetaData();
@@ -289,10 +312,10 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
 
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                if (statusCode == 200 && response.length() > 0){
+                if (statusCode == 200 && response.length() > 0) {
                     clearListView();
                     Log.d(t, response.toString());
-                    Toast.makeText(MainActivity.this, "NO DATA IN DB", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.no_inum), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -300,7 +323,7 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 Toast.makeText(MainActivity.this, "FAILURE", Toast.LENGTH_SHORT).show();
-                Log.d(t,"FAILURE");
+                Log.d(t, "FAILURE");
             }
         });
     }
@@ -313,7 +336,7 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
         params.put("num", num);
         params.put("type", status_type);
 
-        httpClient.post(url, params, new JsonHttpResponseHandler(){
+        httpClient.post(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -322,10 +345,11 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
                 getSupportLoaderManager().getLoader(0).forceLoad();
                 Toast.makeText(MainActivity.this, "SAVE OK " + response.toString(), Toast.LENGTH_SHORT).show();
             }
+
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 Toast.makeText(MainActivity.this, "ERROR WITH UPDATE ITEM STATUS", Toast.LENGTH_SHORT).show();
-                Log.d(t,"FAILURE");
+                Log.d(t, "FAILURE");
             }
         });
     }

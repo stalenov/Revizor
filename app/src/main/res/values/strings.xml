@@ -12,4 +12,8 @@
     <string name="tv_dialog_senior_text">Ответственный</string>
     <string name="tv_dialog_barcode_text">Штрих-код</string>
     <string name="tv_dialog_last_verified_text">Дней с проверки</string>
+    <string name="etInumHint">Инвентарный номер</string>
+    <string name="no_inum">База не содержит записей об этом инвентарном номере</string>
+    <string name="menu_preferences">Настройки</string>
+    <string name="menu_add_device">Добавить устройство</string>
 </resources>
