@@ -2,7 +2,6 @@ package com.kotsokrat.revizor;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 public class PrefActivity extends AppCompatActivity{
@@ -12,7 +11,6 @@ public class PrefActivity extends AppCompatActivity{
         setContentView(R.layout.activity_pref);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        getFragmentManager().beginTransaction().replace(R.id.frameLayout, new PrefFragment()).commit();
 
     }
 }

@@ -20,11 +20,9 @@
     <string name="pref_url">URL сервера</string>
     <string name="pref_login">Логин</string>
     <string name="pref_password">Пароль</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="pref_server">Подключение сервера</string>
-    <string name="pref_url_summary">Полный адрес веб-сервера</string>
+    <string name="pref_url_summary">Полынй адрес веб-сервера</string>
     <string name="pref_login_summary">Имя польователя сервера</string>
     <string name="pref_password_summary">Пароль</string>
     <string name="no_prefs_msg">Отсутствует одна или несколько обязательных настроек</string>
