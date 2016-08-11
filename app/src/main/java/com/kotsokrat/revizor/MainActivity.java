@@ -22,12 +22,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.loopj.android.http.AsyncHttpClient;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     Button btn;
     SimpleCursorAdapter simpleCursorAdapter;
     AsyncHttpClient httpClient;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +101,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         dba.flushDB();
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportActionBar();
+
+        // прогресс-бар
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+/*        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setProgressBarIndeterminateVisibility(true);
+        setProgressBarIndeterminateVisibility(false);*/
 
     }
 
@@ -269,6 +278,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.btnInum) {
+                if(etInum.length() == 0) {
+                    Toast.makeText(MainActivity.this, getString(R.string.toast_if_et_empty), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 try {
                     Log.d(t, "onClick!");
                     getSaveShowAll();
@@ -287,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         View dialogView = getLayoutInflater().inflate(R.layout.about_item_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView)
-                .setPositiveButton(getString(R.string.show_about_close_btn), new DialogInterface.OnClickListener(){
+                .setPositiveButton(getString(R.string.show_about_close_btn), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -327,6 +341,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         httpClient.get(url, new JsonHttpResponseHandler() {
             @Override
+            public void onStart() {
+                super.onStart();
+                Log.d(t, "Start");
+                progressBar.setVisibility(ProgressBar.VISIBLE);
+            }
+
+            @Override
+            public void onFinish() {
+                super.onFinish();
+                Log.d(t, "Stop");
+                progressBar.setVisibility(ProgressBar.INVISIBLE);
+            }
+            @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
                 if (statusCode == 200 && response.length() > 0) {
@@ -349,16 +376,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-                Toast.makeText(MainActivity.this, "FAILURE, response string " + responseString, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "FAILURE,  statusCode: " + statusCode, Toast.LENGTH_SHORT).show();
                 Log.d(t, "FAILURE, statusCode: "  + statusCode);
             }
-
-            /*@Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Toast.makeText(MainActivity.this, "FAILURE", Toast.LENGTH_SHORT).show();
-                Log.d(t, "FAILURE");
-            }*/
         });
 
     }
@@ -371,21 +391,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         params.put("num", num);
         params.put("type", status_type);
 
-            httpClient.post(url, params, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    super.onSuccess(statusCode, headers, response);
-                    Log.d(t, response.toString());
-                    getSaveShowAll();
-                    getSupportLoaderManager().getLoader(0).forceLoad();
-                    Toast.makeText(MainActivity.this, "SAVE OK " + response.toString(), Toast.LENGTH_SHORT).show();
-                }
+        httpClient.post(url, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onStart() {
+                super.onStart();
+                Log.d(t, "Start");
 
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    Toast.makeText(MainActivity.this, "ERROR WITH UPDATE ITEM STATUS", Toast.LENGTH_SHORT).show();
-                    Log.d(t, "FAILURE");
-                }
-            });
+            }
+
+            @Override
+            public void onFinish() {
+                super.onFinish();
+                Log.d(t, "Stop");
+                progressBar.setVisibility(ProgressBar.INVISIBLE);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d(t, response.toString());
+                getSaveShowAll();
+                getSupportLoaderManager().getLoader(0).forceLoad();
+                //Toast.makeText(MainActivity.this, "SAVE OK " + response.toString(), Toast.LENGTH_SHORT).show();
+            }
+
+/*            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }*/
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Toast.makeText(MainActivity.this, "CONNECTION FAILURE,  statusCode: " + statusCode, Toast.LENGTH_SHORT).show();
+                Log.d(t, "FAILURE");
+            }
+        });
     }
 }
