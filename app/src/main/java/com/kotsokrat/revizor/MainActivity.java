@@ -324,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void getSaveShowAll(){
         int inum = Integer.parseInt(etInum.getText().toString());
         String url = httpAddr + "?num=" + inum;
+
         httpClient.get(url, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -346,12 +347,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
 
             @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Toast.makeText(MainActivity.this, "FAILURE, response string " + responseString, Toast.LENGTH_SHORT).show();
+                Log.d(t, "FAILURE, statusCode: "  + statusCode);
+            }
+
+            /*@Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 Toast.makeText(MainActivity.this, "FAILURE", Toast.LENGTH_SHORT).show();
                 Log.d(t, "FAILURE");
-            }
+            }*/
         });
+
     }
 
 
@@ -362,21 +371,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         params.put("num", num);
         params.put("type", status_type);
 
-        httpClient.post(url, params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Log.d(t, response.toString());
-                getSaveShowAll();
-                getSupportLoaderManager().getLoader(0).forceLoad();
-                Toast.makeText(MainActivity.this, "SAVE OK " + response.toString(), Toast.LENGTH_SHORT).show();
-            }
+            httpClient.post(url, params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    Log.d(t, response.toString());
+                    getSaveShowAll();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    Toast.makeText(MainActivity.this, "SAVE OK " + response.toString(), Toast.LENGTH_SHORT).show();
+                }
 
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Toast.makeText(MainActivity.this, "ERROR WITH UPDATE ITEM STATUS", Toast.LENGTH_SHORT).show();
-                Log.d(t, "FAILURE");
-            }
-        });
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    Toast.makeText(MainActivity.this, "ERROR WITH UPDATE ITEM STATUS", Toast.LENGTH_SHORT).show();
+                    Log.d(t, "FAILURE");
+                }
+            });
     }
 }
