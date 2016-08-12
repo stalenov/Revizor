@@ -6,13 +6,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,12 +20,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -35,11 +31,8 @@ import android.widget.Toast;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import cz.msebera.android.httpclient.Header;
 
 
@@ -64,18 +57,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // check preferences
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        httpAddr = sp.getString("url", "");
-        login = sp.getString("login", "");
-        password = sp.getString("password", "");
-
-        if (httpAddr.equals("") || login.equals("") || password.equals("")) {
-            Toast.makeText(this, getString(R.string.no_prefs_msg), Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, PrefActivity.class);
-            startActivity(intent);
-        }
-
         dba = new DBA(this);
         dba.openDB();
 
@@ -84,8 +65,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         lvData = (ListView)findViewById(R.id.tvData);
         btn = (Button)findViewById(R.id.btnInum);
 
-        httpClient = new AsyncHttpClient();
-        httpClient.setBasicAuth(login, password);
+        httpClient = new InitHttpClient(this).init();
 
         // листенеры
         btn.setOnClickListener(new BtnInumListener());
@@ -104,9 +84,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // прогресс-бар
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
-/*        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setProgressBarIndeterminateVisibility(true);
-        setProgressBarIndeterminateVisibility(false);*/
 
     }
 
