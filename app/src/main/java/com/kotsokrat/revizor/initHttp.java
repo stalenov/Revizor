@@ -8,15 +8,11 @@ import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 
-public class InitHttpClient {
+public class InitHttp {
     String httpAddr, login, password;
-    AsyncHttpClient httpClient;
     Context context;
-    public InitHttpClient(Context context) {
+    public InitHttp(Context context) {
         this.context = context;
-    }
-
-    public AsyncHttpClient init(){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         httpAddr = sp.getString("url", "");
         login = sp.getString("login", "");
@@ -25,13 +21,17 @@ public class InitHttpClient {
         if (httpAddr.equals("") || login.equals("") || password.equals("")) {
             Toast.makeText(context, context.getString(R.string.no_prefs_msg), Toast.LENGTH_LONG).show();
             Intent intent = new Intent(context, PrefActivity.class);
-            //startActivity(intent);
+            context.startActivity(intent);
         }
+    }
 
-        httpClient = new AsyncHttpClient();
+    public AsyncHttpClient init(){
+        AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.setBasicAuth(login, password);
         return httpClient;
-
+    }
+    public String getAddr(){
+        return httpAddr;
     }
 
 

@@ -3,9 +3,7 @@ package com.kotsokrat.revizor;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -42,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public final String STATUS_NOTOK = "NOTOK";
     public final String STATUS_LOST = "LOST";
 
-    String login, password, httpAddr; // "http://84.204.30.84:56565/restInvent/index.php";
+    String httpAddr; // "http://84.204.30.84:56565/restInvent/index.php";
     DBA dba;
     EditText etInum;
     ListView lvData;
@@ -65,7 +63,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         lvData = (ListView)findViewById(R.id.tvData);
         btn = (Button)findViewById(R.id.btnInum);
 
-        httpClient = new InitHttpClient(this).init();
+        InitHttp ih = new InitHttp(this);
+        httpClient = ih.init();
+        httpAddr = ih.getAddr();
 
         // листенеры
         btn.setOnClickListener(new BtnInumListener());
