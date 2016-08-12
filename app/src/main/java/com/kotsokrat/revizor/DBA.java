@@ -28,7 +28,11 @@ public class DBA {
     public final static String LAST_VERIFIED = "last_verified";
     public final static String LAST_VERIFIED_ICON = "last_verified_icon";
 
+    public final static String NAME = "name";
+
     public final static String TABLE_NAME = "invent";
+    public final static String TABLE_NAME_DEVICES = "devicenames";
+    public final static String TABLE_NAME_CONFIGS = "deviceconfs";
 
     public final static int revizorCheckPeroid = 60; // day numbers before state changed
 
@@ -68,6 +72,7 @@ public class DBA {
                 cv.put(SENIOR, jArray.getJSONObject(i).getString(SENIOR));
                 cv.put(QUANTITY, jArray.getJSONObject(i).getString(QUANTITY));
                 cv.put(BARCODE, jArray.getJSONObject(i).getString(BARCODE));
+                cv.put(LAST_VERIFIED, jArray.getJSONObject(i).getString(LAST_VERIFIED));
 
                 int state = Integer.parseInt(jArray.getJSONObject(i).getString(LAST_VERIFIED));
                 if (state == -1 || state > revizorCheckPeroid ) {
@@ -78,13 +83,22 @@ public class DBA {
                     cv.put(LAST_VERIFIED_ICON, R.drawable.check);
                 }
 
-
-                cv.put(LAST_VERIFIED, jArray.getJSONObject(i).getString(LAST_VERIFIED));
-                //cv.put(LAST_VERIFIED, "hren tobi");
-
                 db.insert(TABLE_NAME, null, cv);
             }
         }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void saveDevicesToDB(JSONArray jArray, String tableName){
+        try {
+            for (int i = 0; i < jArray.length(); i++){
+                ContentValues cv = new ContentValues();
+                cv.put(NAME, jArray.getJSONObject(i).getString(NAME));
+                db.insert(tableName, null, cv);
+            }
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
