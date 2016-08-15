@@ -27,4 +27,5 @@
     <string name="pref_password_summary">Пароль</string>
     <string name="no_prefs_msg">Отсутствует одна или несколько обязательных настроек. Внесите необходимые изменения и начните работу.</string>
     <string name="toast_if_et_empty">Не заполнено поле инвентарного номера</string>
+    <string name="add_dev_label">Добавление нового устройства</string>
 </resources>

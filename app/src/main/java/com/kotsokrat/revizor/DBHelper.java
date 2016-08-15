@@ -23,11 +23,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_DEVNAMES_TABLE_QUERY = "CREATE TABLE " + DBA.TABLE_NAME_DEVICES + " ("
             + DBA.ID + " INTEGER PRIMARY KEY, "
-            + DBA.NAME + " TEXT)";
+            + DBA.ITEM + " TEXT, "
+            + DBA.CONF + " TEXT)";
 
-    private static final String CREATE_DEVCONFS_TABLE_QUERY = "CREATE TABLE " + DBA.TABLE_NAME_CONFIGS + " ("
-            + DBA.ID + " INTEGER PRIMARY KEY, "
-            + DBA.NAME + " TEXT)";
+
+
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -37,7 +37,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_ITEMS_TABLE_QUERY);
         db.execSQL(CREATE_DEVNAMES_TABLE_QUERY);
-        db.execSQL(CREATE_DEVCONFS_TABLE_QUERY);
+        //db.execSQL(CREATE_DEVCONFS_TABLE_QUERY);
     }
 
     @Override

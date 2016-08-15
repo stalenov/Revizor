@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         lvData.setAdapter(simpleCursorAdapter);
         lvData.setOnItemClickListener(new ListItemClick());
         registerForContextMenu(lvData);
-        dba.flushDB();
+        dba.flushItemsDB();
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportActionBar();
 
@@ -113,7 +113,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 //Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.menu_add_device:
-                Toast.makeText(this, "Данная функция пока не реализована!!!", Toast.LENGTH_SHORT).show();
+                Intent addDev = new Intent(this, AddDeviceActivity.class);
+                startActivity(addDev);
+
+                //Toast.makeText(this, "Данная функция пока не реализована!!!", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -334,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
                 if (statusCode == 200 && response.length() > 0) {
-                    dba.flushDB();
+                    dba.flushItemsDB();
                     dba.saveItemsToDB(response);
                     printMetaData();
                     getSupportLoaderManager().getLoader(0).forceLoad();

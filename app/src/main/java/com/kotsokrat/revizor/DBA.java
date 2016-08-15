@@ -10,6 +10,8 @@ import android.util.Log;
 
 import org.json.JSONArray;
 
+import java.util.ArrayList;
+
 
 public class DBA {
     private Context context;
@@ -28,11 +30,11 @@ public class DBA {
     public final static String LAST_VERIFIED = "last_verified";
     public final static String LAST_VERIFIED_ICON = "last_verified_icon";
 
-    public final static String NAME = "name";
+    //public final static String NAME = "name";
 
     public final static String TABLE_NAME = "invent";
     public final static String TABLE_NAME_DEVICES = "devicenames";
-    public final static String TABLE_NAME_CONFIGS = "deviceconfs";
+    //public final static String TABLE_NAME_CONFIGS = "deviceconfs";
 
     public final static int revizorCheckPeroid = 60; // day numbers before state changed
 
@@ -91,17 +93,27 @@ public class DBA {
     }
 
 
-    public void saveDevicesToDB(JSONArray jArray, String tableName){
+    public void saveDevicesToDB(JSONArray jArray){
         try {
             for (int i = 0; i < jArray.length(); i++){
                 ContentValues cv = new ContentValues();
-                cv.put(NAME, jArray.getJSONObject(i).getString(NAME));
-                db.insert(tableName, null, cv);
+                cv.put(ITEM, jArray.getJSONObject(i).getString(ITEM));
+                cv.put(CONF, jArray.getJSONObject(i).getString(CONF));
+                db.insert(TABLE_NAME_DEVICES, null, cv);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
+
+    public Cursor getDeviceTypesList(){
+        return db.query(TABLE_NAME_DEVICES, null, null, null, null, null, null);
+
+
+
+
+    }
+
 
 
     public String getInumByTableId(long id){
@@ -147,8 +159,10 @@ public class DBA {
 
     }
 
-
-    public void flushDB(){
+    public void flushDevicesDB(){
+        db.execSQL("DELETE FROM " + TABLE_NAME_DEVICES);
+    }
+    public void flushItemsDB(){
         db.execSQL("DELETE FROM " + TABLE_NAME);
     }
 

@@ -22,7 +22,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
-        <activity android:name=".AddDeviceActivity"/>
+        <activity
+            android:name=".AddDeviceActivity"
+            android:label="@string/add_dev_label">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
     </application>
 
 </manifest>
